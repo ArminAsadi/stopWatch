@@ -1,0 +1,80 @@
+# Stop Watch by: Armin 11/11/14 original code
+# Purpose: try to STOP clock at a whole number ex: 10.0 or 100.0
+# Not: 10.1 or 10.9 ... from Coursera.org class project
+# Optional: add cool font to timer
+
+import time
+try:
+    import simplegui
+except:
+    import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
+
+width = 300
+height = 300
+ctrl_width = 200
+interval = 100
+buttonSize = 150
+
+timer_int = 0
+success_stop = 0
+total_stop = 0
+last_stop = 0
+
+# helper fuctions. Why '600' ? change num to see difference..saw no difference -_-
+def format(timer_int):
+    A = timer_int // 600
+    B = timer_int % 600 // 100
+    C = timer_int % 100 // 10
+    D = timer_int % 10
+    return str(A) + ":" + str(B) + str(C) + "." + str(D)
+
+# button handlers
+def startButton():
+    timer.start()
+
+# stops timer. increments if success then counters it
+# if last stop isn't 0 then add 1 to timer like a watch
+# if the stopwatch is divisible by 10 to == 0, add 1 to score
+# last stop is the timer so it keeps looping until manually stopped
+def stopButton():
+    global timer_int, total_stop, success_stop, last_stop
+    timer.stop()
+    if last_stop != timer_int:
+        total_stop = total_stop + 1
+        if timer_int % 10 == 0:
+            success_stop = success_stop + 1
+    last_stop = timer_int
+
+def resetButton():
+    global timer_int, total_stop, success_stop
+    timer.stop()
+    timer_int = 0
+    total_stop = 0
+    success_stop = 0
+
+def quit_gameButton():
+    frame.stop()
+
+def timer_handler():
+    global timer_int
+    timer_int = timer_int + 1
+
+# 1st line draws and positions A:BC.D
+# 2nd line draws and positions score 0/0
+def drawStopwatch(canvas):
+    canvas.draw_text(format(timer_int), [width/4, height/2.5], width/6, "Gold")
+    canvas.draw_text(str(success_stop) + "/" + str(total_stop), (width/1.70, height/5), width/15, "Orange")
+
+frame = simplegui.create_frame("Stop Watch", width, height, ctrl_width)
+frame.set_canvas_background("black")
+frame.set_draw_handler(drawStopwatch)
+label = frame.add_label("Stop Watch")
+frame.add_button("Start", startButton, buttonSize)
+frame.add_button("Stop", stopButton, buttonSize)
+frame.add_button("Reset", resetButton, buttonSize)
+label = frame.add_label("")
+label = frame.add_label("")
+label = frame.add_label("")
+frame.add_button("Quit", quit_gameButton, buttonSize)
+timer = simplegui.create_timer(interval, timer_handler)
+frame.start()
